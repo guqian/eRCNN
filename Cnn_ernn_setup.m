@@ -1,8 +1,8 @@
-function [sy] = Cnn_rnn_setup( sy,W_R,b_R,E_l,K,alpha)
+function [sy] = Cnn_ernn_setup( sy,W_R,b_R,E_l,K,alpha)
 sy.alpha = alpha;
 sy.E_l = E_l;
 sy.K = K;
-sy.W_R = repmat(W_R,sy.K,1);  %³õÊ¼Öµ£¬¿É¼ÓÈëÎ¢Ğ¡ÈÅ¶¯
+sy.W_R = repmat(W_R,sy.K,1);  %åˆå§‹å€¼ï¼Œå¯åŠ å…¥å¾®å°æ‰°åŠ¨
 sy.b_R = repmat(b_R,sy.K,1); 
 sy.W_E  = sy.alpha*rand(sy.K,sy.E_l);
 sy.b_E = sy.alpha*rand(1,sy.K);
