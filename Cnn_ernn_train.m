@@ -1,29 +1,29 @@
 function [sy,MAE,bestMAPE1,bestMAPE,bestRMSE1,bestRMSE2] = Cnn_rnn_train( sy,train_x,train_y,jump,sequence_length)
 %addpath(genpath('D:/research/DeepLearnToolbox-master'));
-% sequence_length´ú±íÃ¿¸öĞòÁĞµÄ³¤¶È
-%MAEMin = 1000;  %¸³¸ö´óÊı£¬²éÕÒmatlabÖĞµÄ´óÊıÉèÖÃ¡£
+% sequence_lengthä»£è¡¨æ¯ä¸ªåºåˆ—çš„é•¿åº¦
+%MAEMin = 1000;  %èµ‹ä¸ªå¤§æ•°ï¼ŒæŸ¥æ‰¾matlabä¸­çš„å¤§æ•°è®¾ç½®ã€‚
 %E_l =4;
-%K = 4;    %ÉèÖÃµÄÉñ¾­Ôª¸öÊı£¬ÕâÀï½µµÍÁË¸´ÔÓ¶È£¬²¢ÇÒR¸úEµÄKÖµÒ²¿ÉÉèÖÃ²»Í¬
+%K = 4;    %è®¾ç½®çš„ç¥ç»å…ƒä¸ªæ•°ï¼Œè¿™é‡Œé™ä½äº†å¤æ‚åº¦ï¼Œå¹¶ä¸”Rè·ŸEçš„Kå€¼ä¹Ÿå¯è®¾ç½®ä¸åŒ
 alpha=0.01;
 [m,n] =size(train_x);
-for q = 1:sy.numpoches %½«MAE¡¢MAPE¡¢RMSE·Ö±ğÖÃ0
+for q = 1:sy.numpoches %å°†MAEã€MAPEã€RMSEåˆ†åˆ«ç½®0
     MAE =0;
     %sy.W_E = zeros(E_l,1);
 for j = 0:(size(train_y,2)/sequence_length-1)
-    %ÕâĞ©²¿·ÖÓ¦¸ÃĞ´ÔÚÒ»¸ösetupÖĞ
-    layer.errors =zeros(1,sy.right);   %Éñ¾­ÔªerrorĞòÁĞ¾ØÕóÇå0£¬ÕâÀïÓÃµÄ´óĞ¡Îª4
-    layer_E.output = zeros(sy.K,sy.right);  %Éñ¾­ÔªÖµĞòÁĞÇå0
-    layer_R.output = zeros(sy.K,sy.right);  %Ã¿¸öÉñ¾­Ôª²úÉú²»Í¬µÄËæ»ú³õÊ¼Öµ
+    %è¿™äº›éƒ¨åˆ†åº”è¯¥å†™åœ¨ä¸€ä¸ªsetupä¸­
+    layer.errors =zeros(1,sy.right);   %ç¥ç»å…ƒerroråºåˆ—çŸ©é˜µæ¸…0ï¼Œè¿™é‡Œç”¨çš„å¤§å°ä¸º4
+    layer_E.output = zeros(sy.K,sy.right);  %ç¥ç»å…ƒå€¼åºåˆ—æ¸…0
+    layer_R.output = zeros(sy.K,sy.right);  %æ¯ä¸ªç¥ç»å…ƒäº§ç”Ÿä¸åŒçš„éšæœºåˆå§‹å€¼
     %layer_1.values = [layer_1.values;1];
     %layer_2.values = zeros(1,sy.left-1)';
     
-    %layer_2.deltas =zeros(1,sy.left-1)';  %µÚ¶ş²ãµÄÎó²î
+    %layer_2.deltas =zeros(1,sy.left-1)';  %ç¬¬äºŒå±‚çš„è¯¯å·®
     flag =zeros(1,sy.right);
-    for position = sy.left:sy.right       %ĞèÒª¼ÆËãµÄÇø¼ä·¶Î§
-        X=  train_x(:,sequence_length*j+position);  %ÊäÈëÏòÁ¿
-        Y = train_y(sequence_length*j+position);    %Êµ¼Ê½á¹û
+    for position = sy.left:sy.right       %éœ€è¦è®¡ç®—çš„åŒºé—´èŒƒå›´
+        X=  train_x(:,sequence_length*j+position);  %è¾“å…¥å‘é‡
+        Y = train_y(sequence_length*j+position);    %å®é™…ç»“æœ
         E =[];
-        for i = position-sy.E_l:position-1             %¹¹ÔìeÏòÁ¿
+        for i = position-sy.E_l:position-1             %æ„é€ eå‘é‡
             if(i <=0)
                 E = [E;0];
             else
@@ -33,24 +33,24 @@ for j = 0:(size(train_y,2)/sequence_length-1)
         %if(position >sy.left)
          %   preY = train_y(sequence_length*j+position-1);
         %end
-        layer_R.output(:,position) = sigmoid(sy.W_R*X + sy.b_R)'; %XÊÇcnnÈ«Á¬½ÓµÄÊä³ö£¬Ò²¿É¹¹Ôì³ÉÃ¿¸ö¾í»ıºËµÄ½á¹û½øÈëÒ»¸öÉñ¾­Ôª¡£
+        layer_R.output(:,position) = sigmoid(sy.W_R*X + sy.b_R)'; %Xæ˜¯cnnå…¨è¿æ¥çš„è¾“å‡ºï¼Œä¹Ÿå¯æ„é€ æˆæ¯ä¸ªå·ç§¯æ ¸çš„ç»“æœè¿›å…¥ä¸€ä¸ªç¥ç»å…ƒã€‚
         layer_E.output(:,position) = sigmoid(sy.W_E*E + sy.b_E)'; 
         layer.output = sy.W_OR*layer_R.output(:,position) + sy.W_OE*layer_E.output(:,position);
         if(layer.output <= 0)
             layer.output = 0;
-            flag(position) =1;   %deadÉñ¾­Ôª
+            flag(position) =1;   %deadç¥ç»å…ƒ
         else if (layer.output >=1)
             layer.output = 1;
             flag(position) =1;
             end
-        end        %¹À¼Æ·¶Î§±»ÏŞÖÆÔÚ0-1
-        layer.errors(position) = Y - layer.output;  %¼ÆËãerror²ãµÄÖµ
+        end        %ä¼°è®¡èŒƒå›´è¢«é™åˆ¶åœ¨0-1
+        layer.errors(position) = Y - layer.output;  %è®¡ç®—errorå±‚çš„å€¼
         %layer_2_values = [layer_2_values;layer_2];
         %layer_1_MAEs = [layer_1_MAEs;Y-layer_1];
         %layer_2_delta = Y - layer_2;
-        %layer_2_deltas = [layer_2_deltas; layer_2_MAE*sigmoid_output_to_derivative(layer_2)];%ÏÈËã¸ö¼òµ¥µÄ ²»¸üĞÂlayer_2.
+        %layer_2_deltas = [layer_2_deltas; layer_2_MAE*sigmoid_output_to_derivative(layer_2)];%å…ˆç®—ä¸ªç®€å•çš„ ä¸æ›´æ–°layer_2.
         %layer_2_deltas = [layer_2_deltas;layer_2_MAE];
-        % ×ÜÌåµÄÎó²î£¨Îó²îÓĞÕıÓĞ¸º£¬ÓÃ¾ø¶ÔÖµ£©
+        % æ€»ä½“çš„è¯¯å·®ï¼ˆè¯¯å·®æœ‰æ­£æœ‰è´Ÿï¼Œç”¨ç»å¯¹å€¼ï¼‰
         
         %MAE = MAE + abs(layer_2_MAE);
         %if(Y<=0.833)
@@ -61,15 +61,15 @@ for j = 0:(size(train_y,2)/sequence_length-1)
         %end;
         
         
-        % ¼ÇÂ¼ÏÂ´Ë´ÎµÄÒşº¬²ã (S(t))
+        % è®°å½•ä¸‹æ­¤æ¬¡çš„éšå«å±‚ (S(t))
         % store hidden layer so we can use it in the next timestep
         %layer_1_values = [layer_1_values; layer_1];
     end
     
-    % ¼ÆËãÒşº¬²ãµÄdiff£¬ÓÃÓÚÇó²ÎÊıµÄ±ä»¯£¬²¢ÓÃÀ´¸üĞÂ²ÎÊı£¬»¹ÊÇÃ¿Ò»¸ötimestepÀ´½øĞĞ¼ÆËã
+    % è®¡ç®—éšå«å±‚çš„diffï¼Œç”¨äºæ±‚å‚æ•°çš„å˜åŒ–ï¼Œå¹¶ç”¨æ¥æ›´æ–°å‚æ•°ï¼Œè¿˜æ˜¯æ¯ä¸€ä¸ªtimestepæ¥è¿›è¡Œè®¡ç®—
     %future_layer_1_delta = zeros(1, hidden_dim);
     
-    % ¿ªÊ¼½øĞĞ·´Ïò´«²¥£¬¼ÆËã hidden_layer µÄdiff£¬ÒÔ¼°²ÎÊıµÄ diff
+    % å¼€å§‹è¿›è¡Œåå‘ä¼ æ’­ï¼Œè®¡ç®— hidden_layer çš„diffï¼Œä»¥åŠå‚æ•°çš„ diff
      sy.d_E = zeros(sy.K,sy.right); 
      sy.d_O = zeros(1,sy.right);
      sy.d_R = zeros(sy.K,sy.right);
@@ -90,7 +90,7 @@ for j = 0:(size(train_y,2)/sequence_length-1)
             end
         end
         if(flag(position)==0)
-            sy.d_O(position) = layer.errors(position)+ sum(sum(rot90(sy.W_E,2).*d_E)');                  %×¢Òâ´Ë´¦Òª·­×ª,È»ºó×öÄÚ»ı
+            sy.d_O(position) = layer.errors(position)+ sum(sum(rot90(sy.W_E,2).*d_E)');                  %æ³¨æ„æ­¤å¤„è¦ç¿»è½¬,ç„¶ååšå†…ç§¯
         else                                                              %sy.dH = sy.dH+layer_1_MAEs(position-1-jump)*layer_2_deltas(position)
             sy.d_O(position) = sum((sum(rot90(sy.W_E,2).*d_E))');
         end
@@ -98,12 +98,12 @@ for j = 0:(size(train_y,2)/sequence_length-1)
             sy.d_E(i,position)=sy.d_O(position)*sy.W_OE(i)*layer_E.output(i,position)*(1-layer_E.output(i,position));
             sy.d_R(i,position)=sy.d_O(position)*sy.W_OR(i)*layer_R.output(i,position)*(1-layer_R.output(i,position));
         end 
-        %Ìİ¶ÈÏÂ½µ·¨½øĞĞ¸üĞÂ£¬ÕâÀïÃ¿¸ö¿é´óĞ¡Îª192£¬¿ÉÒÔÓÃÆäËûÈ¡¿é·½·¨½øĞĞ¸Ä½ø¡£
+        %æ¢¯åº¦ä¸‹é™æ³•è¿›è¡Œæ›´æ–°ï¼Œè¿™é‡Œæ¯ä¸ªå—å¤§å°ä¸º192ï¼Œå¯ä»¥ç”¨å…¶ä»–å–å—æ–¹æ³•è¿›è¡Œæ”¹è¿›ã€‚
         delta.W_OR = delta.W_OR + sy.d_O(position)*layer_R.output(:,position);
         delta.W_OE = delta.W_OE + sy.d_O(position)*layer_E.output(:,position);
         delta.W_R = delta.W_R + sy.d_R(position)*train_x(:,sequence_length*j+position);
         E = [];
-        for i = position-sy.E_l:position-1             %¹¹ÔìeÏòÁ¿
+        for i = position-sy.E_l:position-1             %æ„é€ eå‘é‡
             if(i <=0)
                 E = [E,0];
             else
