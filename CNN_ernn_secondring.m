@@ -47,12 +47,12 @@ sy.dW = zeros(size(sy.W));
 sy.db = zeros(size(sy.b));
 sy.dU = zeros(size(sy.U));
 sy.dH = zeros(size(sy.H));
-sy.numpoches = 10;  %%µü´ú´ÎÊı
+sy.numpoches = 10;  %%è¿­ä»£æ¬¡æ•°
 
 sy.ErrorMin = 1000;
 train_x = net.fv;
 train_y = train_y_new;
-%%ÖØĞÂ×éÖ¯train_yÖ»±£Áô¹¤×÷ÈÕµÄ´úÂë
+%%é‡æ–°ç»„ç»‡train_yåªä¿ç•™å·¥ä½œæ—¥çš„ä»£ç 
 % bk = [];
 % bk1 =[];
 % ak = [];
@@ -86,10 +86,10 @@ if jump ==-1
 else
     jump1 =jump;
 end
-sy = Cnn_rnn_setup(sy,net.ffW,net.ffb,4,4,0.1);
-[sy1,error1,MAPE1,MAPE2,SD1,SD2]=Cnn_rnn_train(sy,net.fv,train_y_new(TrainIndex+jump),jump1,192);
+sy = Cnn_ernn_setup(sy,net.ffW,net.ffb,4,4,0.1);
+[sy1,error1,MAPE1,MAPE2,SD1,SD2]=Cnn_ernn_train(sy,net.fv,train_y_new(TrainIndex+jump),jump1,192);
 sy.H = sy1.H;
-[error1,error2,MAPE1,MAPE2,RMSE1,RMSE2]= Cnn_rnn_test(sy,net1.fv,test_y_new(TestIndex+jump),jump1);
+[error1,error2,MAPE1,MAPE2,RMSE1,RMSE2]= Cnn_ernn_test(sy,net1.fv,test_y_new(TestIndex+jump),jump1);
 %error = error1+error;
 %error2 = error3+error2;
 %MAPEall = MAPEall +(MAPE1-MAPE2);
