@@ -1,4 +1,4 @@
-function [error1,error2,bestMAPE1,bestMAPE2,bestRMSE1,bestRMSE2] = Cnn_rnn_test(sy,test_x,test_y,jump)
+function [error1,error2,bestMAPE1,bestMAPE2,bestRMSE1,bestRMSE2] = Cnn_ernn_test(sy,test_x,test_y,jump)
 addpath(genpath('D:/research/DeepLearnToolbox-master'));
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
@@ -19,28 +19,28 @@ for j = 0:(size(test_y,2)/192-1)
     layer_2_deltas =zeros(1,sy.left-1)';
     %layer_1_values = [layer_1_values; zeros(1, hidden_dim)];
     flag =zeros(1,sy.right);
-    % ¿ªÊ¼¶ÔÒ»¸öĞòÁĞ½øĞĞ´¦Àí£¬¸ãÇå³şÒ»¸ö¶«Î÷£¬Ò»¸öLSTMµ¥ÔªµÄÊä³öÆäÊµ¾ÍÊÇÒşº¬²ã
+    % å¼€å§‹å¯¹ä¸€ä¸ªåºåˆ—è¿›è¡Œå¤„ç†ï¼Œææ¸…æ¥šä¸€ä¸ªä¸œè¥¿ï¼Œä¸€ä¸ªLSTMå•å…ƒçš„è¾“å‡ºå…¶å®å°±æ˜¯éšå«å±‚
     for position = sy.left:sy.right
-%         X = [a(binary_dim - position)-'0' b(binary_dim - position)-'0'];   % X ÊÇ input
-%         y = [c(binary_dim - position)-'0']';                               % Y ÊÇlabel£¬ÓÃÀ´¼ÆËã×îºóÎó²î
+%         X = [a(binary_dim - position)-'0' b(binary_dim - position)-'0'];   % X æ˜¯ input
+%         y = [c(binary_dim - position)-'0']';                               % Y æ˜¯labelï¼Œç”¨æ¥è®¡ç®—æœ€åè¯¯å·®
         %disp(192*j+position)
         X=  test_x(:,192*j+position);
         Y = test_y(192*j+position);
         if(position >sy.left)
             preY = test_y(192*j+position-1);
         end
-        % ÕâÀïÊÇRNN£¬Òò´ËÒşº¬²ã±È½Ï¼òµ¥
+        % è¿™é‡Œæ˜¯RNNï¼Œå› æ­¤éšå«å±‚æ¯”è¾ƒç®€å•
         % X ------------------------> input
         % sunapse_0 ----------------> U_i
-        % layer_1_values(end, :) ---> previous hidden layer £¨S(t-1)£©
+        % layer_1_values(end, :) ---> previous hidden layer ï¼ˆS(t-1)ï¼‰
         % synapse_h ----------------> W_i
         % layer_1 ------------------> new hidden layer (S(t))
         layer_1 = sigmoid(sy.W*X + sy.b);
         
         % layer_1 ------------------> hidden layer (S(t))
-        % layer_2 ------------------> ×îÖÕµÄÊä³ö½á¹û£¬ÆäÎ¬¶ÈÓ¦¸ÃÓë label (Y) µÄÎ¬¶ÈÊÇÒ»ÖÂµÄ
-        % ÕâÀïµÄ sigmoid ÆäÊµ¾ÍÊÇÒ»¸ö±ä»»£¬½« hidden layer (size: 1 x 16) ±ä»»Îª 1 x 1
-        % ÓĞĞ´Ê±ºò£¬Èç¹ûÊäÈëÓëÊä³ö²»Æ¥ÅäµÄ»°£¬Ê¹¿ÉÒÔÊ¹ÓÃ softmax ½øĞĞ±ä»¯µÄ
+        % layer_2 ------------------> æœ€ç»ˆçš„è¾“å‡ºç»“æœï¼Œå…¶ç»´åº¦åº”è¯¥ä¸ label (Y) çš„ç»´åº¦æ˜¯ä¸€è‡´çš„
+        % è¿™é‡Œçš„ sigmoid å…¶å®å°±æ˜¯ä¸€ä¸ªå˜æ¢ï¼Œå°† hidden layer (size: 1 x 16) å˜æ¢ä¸º 1 x 1
+        % æœ‰å†™æ—¶å€™ï¼Œå¦‚æœè¾“å…¥ä¸è¾“å‡ºä¸åŒ¹é…çš„è¯ï¼Œä½¿å¯ä»¥ä½¿ç”¨ softmax è¿›è¡Œå˜åŒ–çš„
         % output layer (new binary representation)
         %layer_2 = sigmoid(layer_1*synapse_1)-0.5;
 %         if(layer_1 <0.05)
@@ -55,7 +55,7 @@ for j = 0:(size(test_y,2)/192-1)
         else
            layer_2 = layer_1;
         end;
-                %³¢ÊÔÏÈÖ»¼ÆËãlayer_1£¨Ò»²ã£©
+                %å°è¯•å…ˆåªè®¡ç®—layer_1ï¼ˆä¸€å±‚ï¼‰
         if(layer_2 < 0.05)
             layer_2 = 0;
             flag(position) =1;
@@ -67,11 +67,11 @@ for j = 0:(size(test_y,2)/192-1)
         layer_2_values = [layer_2_values;layer_2];
         layer_1_errors = [layer_1_errors;Y-layer_1];
         
-        % ¼ÆËãÎó²î£¬¸ù¾İÎó²î½øĞĞ·´Ïò´«²¥
-        % layer_2_error ------------> ´Ë´Î£¨µÚ position+1 ´ÎµÄÎó²î£©
-        % l ÊÇÕæÊµ½á¹û
-        % layer_2 ÊÇÊä³ö½á¹û
-        % layer_2_deltas Êä³ö²ãµÄ±ä»¯½á¹û£¬Ê¹ÓÃÁË·´Ïò´«²¥£¬¼ûÄÇ¸öÇóµ¼£¨Êä³ö²ãµÄÊäÈëÊÇ layer_2£¬ÄÇ¾Í¶ÔÊäÈëÇóµ¼¼´¿É£¬È»ºó³ËÒÔÎó²î¾Í¿ÉÒÔµÃµ½Êä³öµÄdiff£©
+        % è®¡ç®—è¯¯å·®ï¼Œæ ¹æ®è¯¯å·®è¿›è¡Œåå‘ä¼ æ’­
+        % layer_2_error ------------> æ­¤æ¬¡ï¼ˆç¬¬ position+1 æ¬¡çš„è¯¯å·®ï¼‰
+        % l æ˜¯çœŸå®ç»“æœ
+        % layer_2 æ˜¯è¾“å‡ºç»“æœ
+        % layer_2_deltas è¾“å‡ºå±‚çš„å˜åŒ–ç»“æœï¼Œä½¿ç”¨äº†åå‘ä¼ æ’­ï¼Œè§é‚£ä¸ªæ±‚å¯¼ï¼ˆè¾“å‡ºå±‚çš„è¾“å…¥æ˜¯ layer_2ï¼Œé‚£å°±å¯¹è¾“å…¥æ±‚å¯¼å³å¯ï¼Œç„¶åä¹˜ä»¥è¯¯å·®å°±å¯ä»¥å¾—åˆ°è¾“å‡ºçš„diffï¼‰
         % did we miss?... if so, by how much?
         layer_2_error = Y - layer_2;
         if(Y<=0.833)
@@ -80,23 +80,23 @@ for j = 0:(size(test_y,2)/192-1)
             SD1 = SD1 + (Y-layer_1)^2;
             SD2 = SD2 + abs(layer_2_error)^2;
         end
-        %layer_2_deltas = [layer_2_deltas; layer_2_error*sigmoid_output_to_derivative(layer_2)];%ÏÈËã¸ö¼òµ¥µÄ ²»¸üĞÂlayer_2.
+        %layer_2_deltas = [layer_2_deltas; layer_2_error*sigmoid_output_to_derivative(layer_2)];%å…ˆç®—ä¸ªç®€å•çš„ ä¸æ›´æ–°layer_2.
         layer_2_deltas = [layer_2_deltas;layer_2_error];
-        % ×ÜÌåµÄÎó²î£¨Îó²îÓĞÕıÓĞ¸º£¬ÓÃ¾ø¶ÔÖµ£©
+        % æ€»ä½“çš„è¯¯å·®ï¼ˆè¯¯å·®æœ‰æ­£æœ‰è´Ÿï¼Œç”¨ç»å¯¹å€¼ï¼‰
         error2 = error2 + abs(layer_2_error);
         % decode estimate so we can print it out
-        % ¾ÍÊÇ¼ÇÂ¼´ËÎ»ÖÃµÄÊä³ö£¬ÓÃÓÚÏÔÊ¾½á¹û
+        % å°±æ˜¯è®°å½•æ­¤ä½ç½®çš„è¾“å‡ºï¼Œç”¨äºæ˜¾ç¤ºç»“æœ
         %d(binary_dim - position) = round(layer_2(1));
         
-        % ¼ÇÂ¼ÏÂ´Ë´ÎµÄÒşº¬²ã (S(t))
+        % è®°å½•ä¸‹æ­¤æ¬¡çš„éšå«å±‚ (S(t))
         % store hidden layer so we can use it in the next timestep
         layer_1_values = [layer_1_values; layer_1];
     end
     
-    % ¼ÆËãÒşº¬²ãµÄdiff£¬ÓÃÓÚÇó²ÎÊıµÄ±ä»¯£¬²¢ÓÃÀ´¸üĞÂ²ÎÊı£¬»¹ÊÇÃ¿Ò»¸ötimestepÀ´½øĞĞ¼ÆËã
+    % è®¡ç®—éšå«å±‚çš„diffï¼Œç”¨äºæ±‚å‚æ•°çš„å˜åŒ–ï¼Œå¹¶ç”¨æ¥æ›´æ–°å‚æ•°ï¼Œè¿˜æ˜¯æ¯ä¸€ä¸ªtimestepæ¥è¿›è¡Œè®¡ç®—
     %future_layer_1_delta = zeros(1, hidden_dim);
     
-    % ¿ªÊ¼½øĞĞ·´Ïò´«²¥£¬¼ÆËã hidden_layer µÄdiff£¬ÒÔ¼°²ÎÊıµÄ diff
+    % å¼€å§‹è¿›è¡Œåå‘ä¼ æ’­ï¼Œè®¡ç®— hidden_layer çš„diffï¼Œä»¥åŠå‚æ•°çš„ diff
 
      for position = sy.right:-1:sy.left+1+jump
         if(flag(position-sy.left+1)==0)
