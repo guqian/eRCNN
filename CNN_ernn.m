@@ -27,12 +27,12 @@ sy.dW = zeros(size(sy.W));
 sy.db = zeros(size(sy.b));
 sy.dU = zeros(size(sy.U));
 sy.dH = zeros(size(sy.H));
-sy.numpoches = 10;  %%µü´ú´ÎÊı
+sy.numpoches = 10;  %%è¿­ä»£æ¬¡æ•°
 
 sy.ErrorMin = 1000;
 train_x = net.fv;
 train_y = train_y_new;
-%%ÖØĞÂ×éÖ¯train_yÖ»±£Áô¹¤×÷ÈÕµÄ´úÂë
+%%é‡æ–°ç»„ç»‡train_yåªä¿ç•™å·¥ä½œæ—¥çš„ä»£ç 
 bk = [];
 bk1 =[];
 ak = [];
