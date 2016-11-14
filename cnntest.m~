@@ -1,0 +1,121 @@
+function [er,er2, er3,partweight] = cnntest(net, x, y,i,xishu,mode)
+    %  feedforward
+    net = cnnff(net, x);
+    if mode ~=0
+        partweight = importdata(['/home/guqian/jarrateNew/' num2str(i) 'jarrate30.txt']);
+    end;
+    %partweightset = repmat(partweight,1,xishu);
+    %if mode ==3
+        %doubtable = importdata(['/home/guqian/Static/num_test' num2str(i) '.txt']);
+    %else
+        %doubtable = importdata(['/home/guqian/Static/num_train' num2str(i) '.txt']);
+    %end;
+    [~, h] = max(net.o);
+    [~, a] = max(y);
+    %h =h(doubtable);
+    %a = a(doubtable);
+    bad = find(h ~= a);
+    indexbusy = find(a == 1);
+    badbusy = find(h(indexbusy) ~= a(indexbusy));
+    er2 = numel(badbusy)/numel(indexbusy);
+    indexunbusy = find(a == 2);
+    badunbusy = find(h(indexunbusy) ~= a(indexunbusy));
+    er3 = numel(badunbusy)/numel(indexunbusy);
+    er = numel(bad) / size(a, 2);
+    disp([num2str(er) ' ' num2str(numel(indexbusy)) ':' num2str(er2) ' ' num2str(numel(indexunbusy)) ':' num2str(er3)]);
+    if mode == 2
+        partweightnew = repmat(partweight,1,7)
+        [~, h] = max(0.7*net.o+0.3*partweightnew);
+        [~, a] = max(y);
+        bad = find(h ~= a);
+        indexbusy = find(a == 1);
+        badbusy = find(h(indexbusy) ~= a(indexbusy));
+        er2 = numel(badbusy)/numel(indexbusy);
+        indexunbusy = find(a == 2);
+        badunbusy = find(h(indexunbusy) ~= a(indexunbusy));
+        er3 = numel(badunbusy)/numel(indexunbusy);
+        er = numel(bad) / size(y, 2);
+        disp([num2str(er) ' ' num2str(numel(indexbusy)) ':' num2str(er2) ' ' num2str(numel(indexunbusy)) ':' num2str(er3)]);
+    end;
+    if mode == 1
+        fid =fopen(['/home/guqian/jarrateNew/' num2str(i) 'jarrate30.txt'],'w');
+        badtotal = 0;
+        for k = 1:72
+            %H{k} = h(:,k:72:k+19*72);
+            A = a(:,k:72:k+19*72);
+            output = net.o(:,k:72:k+19*72);
+            %b = partweight(k)
+            %partweightnew{k} = repmat(partweight(k),1,72)
+            badbest =20;
+            j =0;
+            for i = 0:100
+                b (1,1) = i*0.01;
+                b (2,1) = 1-i*0.01;
+                partweightnew = repmat(b,1,20);
+                [~,H]=max(0.7*output+0.3*partweightnew);
+                bad = find(H ~= A);
+                indexbusy = find(A == 1);
+                badbusy = find(H(indexbusy) ~= A(indexbusy));
+                er1 = numel(badbusy)/numel(indexbusy);
+                if numel(bad) <= badbest
+                    badbest =numel(bad);
+                    j = i;
+                end;
+                if numel(bad) == 0
+                    break;
+                end;
+            end;
+            badtotal = badtotal + badbest;
+            partweight(1,k)=j*0.01;
+            partweight(2,k)=1 -j*0.01;
+        end;
+        for k = 1 : 72
+            fprintf(fid,'%f ',partweight(1,k));
+        end;
+        fprintf(fid,'\n');
+        for k =1 : 72
+            fprintf(fid,'%f ',partweight(2,k));
+        end;
+        fprintf(fid,'\n');
+    end;
+     
+    
+    %[~, h] = max(partweight);
+    %[~, a] = max(y);
+    %bad = find(h ~= a);
+    %er2 = numel(bad) / size(y, 2);
+    %disp(er2);
+    %[~, h] = max(0.7*net.o+0.3*partweight);
+    %[~, a] = max(y);
+    %bad = find(h ~= a);
+    %er3 = numel(bad) / size(y, 2);
+    %disp(er3);
+    %bad1 = find((h==1) ~
+    %3= (a ==1));
+    %if(~isempty(a == 1))
+    %    er1 = numel(bad1) /max(size(a(a==1),2),size(h(h==1),2));
+    %else
+    %    er1 = 0
+    %end;
+    %bad2 = find((h==2) ~= (a ==2));
+    %if(~isempty(a == 2))
+    %    er2 = numel(bad2) /max(size(a(a==2),2),size(h(h==2),2));
+    %else
+    %    er2 = 0;
+    %end;
+    %bad3 = find((h==3) ~= (a ==3));
+    %if(~isempty(a == 3))
+    %    er3 = numel(bad3) /max(size(a(a==3),2),size(h(h==3),2));
+    %else
+    %    er3 = 0;
+    %end;
+    %[~, h] = max(partweight);
+    %bad = find(h ~= a);
+    %er2 = numel(bad) / size(y, 2);
+    %disp(er2)
+    %[~, h] = max(0.3*partweight+0.7*net.o);
+    %bad = find(h ~= a);
+    %er3 = numel(bad) / size(y, 2);
+    %disp(er3)
+    
+end
